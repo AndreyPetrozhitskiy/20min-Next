@@ -7,7 +7,7 @@ import '@/app/Styles/header.scss';
 
 export default function Header({ openModal }) {
   const dispatch = useDispatch();
-  const userId = useSelector((state) => state.auth.user?.ID);
+  const userId = useSelector((state) => state.auth.ID);
   const userInfo = useSelector((state) => state.auth.user);
   const isLoading = useSelector((state) => state.auth.isLoading);
 
@@ -17,14 +17,7 @@ export default function Header({ openModal }) {
     }
   }, [dispatch, userId]);
 
-  const handleLogout = async () => {
-    try {
-      await dispatch(logout());
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
+  
   return (
     <header className="Header">
       <div className="Header__logo">
@@ -41,11 +34,11 @@ export default function Header({ openModal }) {
           <Link href="/projects">Проекты</Link>
           {isLoading ? (
             <span>Loading...</span>
-          ) : userInfo ? (
+          ) : userId ? (
             <>
-              <span>{userInfo.Name}</span>
-              <button onClick={handleLogout}>Выйти</button>
-              <Link href={`/profile/${userInfo.ID}`}>
+              <span>{userInfo}</span>
+             
+              <Link href={`/profile/${userId}`}>
                 <img src="usericon.png" alt="User" />
               </Link>
             </>

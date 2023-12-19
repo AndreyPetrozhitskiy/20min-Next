@@ -38,8 +38,18 @@
     margin-left: 50px;
     font-weight: 500;
     user-select: none;
+    position: relative;
+    span{
+        width: 100px;
+        height: 50px;
+        right: 30px;
+        position: absolute;
+        font-size: 25px;
+        top: 85px;
+    
+    }
     a{
-        font-size: 22px;
+        font-size: 25px;
         color: white;
         text-decoration: none;
         margin-left: 50px;
@@ -62,7 +72,7 @@
         color: white;
         border: none;
         cursor: pointer;
-        margin-left: 150px;
+        margin-left: 240px;
         transition: 0.2s;
         &:hover{
             background-color: rgba(121, 15, 255, 1);
@@ -72,7 +82,7 @@
     img{
         width: 60px;
         height: 60px;
-        margin-left: 50px;
+        margin-left: 250px;
         transition: 0.2s;
         cursor: pointer;
         &:hover{

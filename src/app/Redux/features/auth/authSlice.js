@@ -3,48 +3,53 @@ import jwt from "jsonwebtoken";
 import axios from '@/app/Utils/axios';
 
 const initialState = {
+    ID: null,
     user: null,
     token: null,
     isLoading: false,
     status: null
 }
 
-export const registerUser = createAsyncThunk('/', async ({ name, password }, { rejectWithValue }) => {
-    try {
+const handleErrors = (err, rejectWithValue) => {
+    console.error(err);
 
-        console.log('Request data:', { name, password});
+    if (err.response) {
+        console.error('Response data:', err.response.data);
+        console.error('Response status:', err.response.status);
+        console.error('Response headers:', err.response.headers);
+        return rejectWithValue(err.response.data || { message: 'Server error' });
+    } else if (err.request) {
+        console.error('Request:', err.request);
+    } else {
+        console.error('Error:', err.message);
+    }
+
+    return rejectWithValue({ message: 'Server error' });
+};
+
+export const registerUser = createAsyncThunk('auth/registerUser', async ({ name, password }, { rejectWithValue }) => {
+    try {
+        console.log('Request data:', { name, password });
 
         const { data } = await axios.post('/users/registration', {
             name,
             password
         });
 
-        if (data.token) {
-            window.localStorage.setItem('token', data.token);
+        console.log('Response data:', data);
+
+        if (data.TokenUser) {
+            window.localStorage.setItem('token', data.TokenUser);
         }
 
         return data;
     } catch (err) {
-        console.error(err);
-
-        if (err.response) {
-            console.error('Response data:', err.response.data);
-            console.error('Response status:', err.response.status);
-            console.error('Response headers:', err.response.headers);
-            return rejectWithValue(err.response.data || { message: 'Server error' });
-        } else if (err.request) {
-            console.error('Request:', err.request);
-        } else {
-            console.error('Error:', err.message);
-        }
-
-        return rejectWithValue({ message: 'Server error' });
+        return handleErrors(err, rejectWithValue);
     }
 });
 
-export const loginUser = createAsyncThunk('/', async ({ name, password}, { rejectWithValue }) => {
+export const loginUser = createAsyncThunk('auth/loginUser', async ({ name, password }, { rejectWithValue }) => {
     try {
-
         console.log('Request data:', { name, password });
 
         const { data } = await axios.post('/users/login', {
@@ -52,57 +57,31 @@ export const loginUser = createAsyncThunk('/', async ({ name, password}, { rejec
             password
         });
 
-        if (data.token) {
-            window.localStorage.setItem('token', data.token);
+        console.log('Response data:', data);
+
+        if (data.TokenUser) {
+            window.localStorage.setItem('token', data.TokenUser);
         }
 
         return data;
     } catch (err) {
-        console.error(err);
-
-        if (err.response) {
-            console.error('Response data:', err.response.data);
-            console.error('Response status:', err.response.status);
-            console.error('Response headers:', err.response.headers);
-            return rejectWithValue(err.response.data || { message: 'Server error' });
-        } else if (err.request) {
-            console.error('Request:', err.request);
-        } else {
-            console.error('Error:', err.message);
-        }
-
-        return rejectWithValue({ message: 'Server error' });
+        return handleErrors(err, rejectWithValue);
     }
 });
 
-
-export const me = createAsyncThunk('/', async (_, { rejectWithValue }) => {
+export const me = createAsyncThunk('auth/me', async (ID, { rejectWithValue }) => {
     try {
         console.log('Request data:', {});
 
-        const { data } = await axios.get('/users/one-user/');
+        const { data } = await axiosInstance.get(`/users/one-user/${ID}`);
 
         return data;
     } catch (err) {
-        console.error(err);
-
-        if (err.response) {
-            console.error('Response data:', err.response.data);
-            console.error('Response status:', err.response.status);
-            console.error('Response headers:', err.response.headers);
-            return rejectWithValue(err.response.data || { message: 'Server error' });
-        } else if (err.request) {
-            console.error('Request:', err.request);
-        } else {
-            console.error('Error:', err.message);
-        }
-
-        return rejectWithValue({ message: 'Server error' });
+        return handleErrors(err, rejectWithValue);
     }
 });
+
   
-
-
 
 
 export const authSlice = createSlice({
@@ -118,33 +97,45 @@ export const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addMatcher(
-                (action) => action.type.endsWith('/pending'),
-                (state) => {
-                    if (!state.isLoading) {
-                        state.isLoading = true;
-                        state.status = null;
-                    }
-                }
-            )
-            .addMatcher(
-                (action) => action.type.endsWith('/fulfilled'),
-                (state, action) => {
-                    state.isLoading = false;
-                    state.status = action.payload.message;
-                    state.user = action.payload.user;
-                    state.token = action.payload.token;
-                }
-            )
-            .addMatcher(
-                (action) => action.type.endsWith('/rejected'),
-                (state, action) => {
-                    state.status = action.payload.message;
-                    state.isLoading = false;
-                }
-            );
-    }
+          .addCase(loginUser.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.status = 'Login successful';
+            state.user = action.payload.user;
+            state.token = action.payload.token;
+            state.ID = action.payload.ID;
+          })
+          .addCase(loginUser.rejected, (state, action) => {
+            state.status = action.payload.message;
+            state.isLoading = false;
+          })
+          .addCase(me.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.user = action.payload.user;
+            state.ID = action.payload.ID;
+          })
+          .addCase(me.rejected, (state, action) => {
+            state.status = action.payload.message;
+            state.isLoading = false;
+          })
+          .addMatcher(
+            (action) => action.type.endsWith('/pending'),
+            (state) => {
+              if (!state.isLoading) {
+                state.isLoading = true;
+                state.status = null;
+              }
+            }
+          )
+          .addMatcher(
+            (action) => action.type.endsWith('/rejected'),
+            (state, action) => {
+              state.status = action.payload.message;
+              state.isLoading = false;
+            }
+          );
+      },
 });
+
 
 
 
