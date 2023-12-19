@@ -79,6 +79,7 @@ const ModalAuth = ({ isOpen, onClose, type, setModalType }) => {
           toast.success('Авторизация успешна');
           setPassword('');
           setUsername('');
+          onClose();
         }
       } catch (err) {
         console.error(err);
@@ -103,12 +104,13 @@ const ModalAuth = ({ isOpen, onClose, type, setModalType }) => {
           toast.error('Авторизация не удалась: ' + response.payload.error);
         } else {
           toast.success('Авторизация успешна');
+          onClose();
         }
       } catch (err) {
         console.error(err);
         toast.error('Авторизация не удалась');
       }
-    };
+    }; 
     return (
       <div>
         {isOpen && (
