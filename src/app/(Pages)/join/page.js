@@ -3,33 +3,40 @@ import '@/app/Styles/JoinProject.scss'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 const JoinProject = () => {
+  const [loading, setLoading] = useState(true); // 1. Состояние загрузки
   const [cardsState, setCardsState] = useState([]);
   const [cards, setCards] = useState([]);
   const [participants, setParticipants] = useState([]);
   const [searchInput, setSearchInput] = useState('');
- 
+
   useEffect(() => {
-    // Выполняем GET-запрос при монтировании компонента
+    setLoading(true); // Включаем индикатор загрузки перед запросом
     axios.get('http://74.119.192.138:5000/api/projects/')
       .then(response => {
-        // Обновляем состояние cards данными из ответа сервера
         setCards(response.data);
       })
       .catch(error => {
         console.error('Ошибка при загрузке данных:', error);
+      })
+      .finally(() => {
+        setLoading(false); // Выключаем индикатор загрузки после запроса
       });
-  }, []); // Пустой массив зависимостей гарантирует выполнение эффекта только один раз при монтировании
+  }, []);
+
   useEffect(() => {
-    // Выполняем GET-запрос при монтировании компонента
+    setLoading(true);
     axios.get('http://74.119.192.138:5000/api/role/all-roles')
       .then(response => {
-        // Обновляем состояние participants данными из ответа сервера
         setParticipants(response.data);
       })
       .catch(error => {
         console.error('Ошибка при загрузке данных об участниках:', error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
+
   const handleCardToggle = (index) => {
     setCardsState((prevState) => {
       const newCardsState = [...prevState];
@@ -37,28 +44,28 @@ const JoinProject = () => {
       return newCardsState;
     });
   };
-
  
 
   
 return (
   <div className="Join__Project">
-    <h1>ПРИСОЕДИНИТЬСЯ К ПРОЕКТУ</h1>
-    <div className="Join__Project__search-block">
-    <input
+      <h1>ПРИСОЕДИНИТЬСЯ К ПРОЕКТУ</h1>
+      <div className="Join__Project__search-block">
+        <input
           type="text"
           placeholder="Найти проект"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
         />
-      <img src="Lupa.png" />
-    </div>
-    {/* Тут функция MAP  */}
-    {cards.filter((card) =>
+        <img src="Lupa.png" alt="search" />
+      </div>
+      {loading && <div className='Loading'><img src={"https://gifgive.com/wp-content/uploads/2021/09/zagruzka.gif"} /></div>} {/* 2. Индикатор загрузки */}
+      {cards
+        .filter((card) =>
           card.NameProject.toLowerCase().includes(searchInput.toLowerCase())
         )
-    .map((card, index) => (
-      <div
+        .map((card, index) => (
+          <div
         key={index}
         className={`Join__Project__item${cardsState[index] ? '__extended' : ''}`}
       >
@@ -97,9 +104,9 @@ return (
           />
         </div>
       </div>
-    ))}
-  </div>
-)
+        ))}
+    </div>
+  );
 };
 
 export default JoinProject;
