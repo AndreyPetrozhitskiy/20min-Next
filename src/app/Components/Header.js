@@ -2,14 +2,15 @@
 import Link from "next/link";
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { me, logout } from '@/app/Redux/features/auth/authSlice';
+import { me } from '@/app/Redux/features/auth/authSlice';
 import '@/app/Styles/header.scss';
 
 export default function Header({ openModal }) {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth.ID);
   const userInfo = useSelector((state) => state.auth.user);
-  const isLoading = useSelector((state) => state.auth.isLoading);
+  const isLoading = useSelector((state) => state.auth?.isLoading);
+
 
   useEffect(() => {
     if (userId) {

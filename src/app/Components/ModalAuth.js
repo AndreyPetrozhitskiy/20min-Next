@@ -76,7 +76,7 @@ const ModalAuth = ({ isOpen, onClose, type, setModalType }) => {
         if (response.payload && response.payload.error) {
           toast.error('Ошибка при регистрации: ' + response.payload.error);
         } else {
-          toast.success('Авторизация успешна');
+          toast.success('Регистрация успешна');
           setPassword('');
           setUsername('');
           onClose();
@@ -84,6 +84,9 @@ const ModalAuth = ({ isOpen, onClose, type, setModalType }) => {
       } catch (err) {
         console.error(err);
         toast.error('Ошибка при регистрации');
+      } finally {
+        // Сброс текущей формы после отправки
+        dispatch(setCurrentForm(null));
       }
     };
     
