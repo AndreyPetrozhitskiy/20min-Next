@@ -1,6 +1,7 @@
 'use client'
 import '@/app/Styles/JoinProject.scss'
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 const JoinProject = () => {
   const [loading, setLoading] = useState(true); // 1. Состояние загрузки
@@ -8,7 +9,9 @@ const JoinProject = () => {
   const [cards, setCards] = useState([]);
   const [participants, setParticipants] = useState([]);
   const [searchInput, setSearchInput] = useState('');
-
+  const [participationSuccess, setParticipationSuccess] = useState([]); // массив для отслеживания статуса каждого проекта
+  const userId = useSelector((state) => state.auth.ID);
+  console.log(userId)
   useEffect(() => {
     setLoading(true); // Включаем индикатор загрузки перед запросом
     axios.get('http://74.119.192.138:5000/api/projects/')
@@ -36,7 +39,36 @@ const JoinProject = () => {
         setLoading(false);
       });
   }, []);
+  const handleParticipate = (projectId, index) => {
+    const requestData = {
+      projectID: projectId,
+      userID: userId,
+      role: "Участник",
+    };
 
+    axios.post('http://74.119.192.138:5000/api/role/create', requestData)
+      .then(response => {
+        console.log('Роль успешно создана:', response.data);
+        setParticipationSuccess((prev) => {
+          const updatedSuccessArray = [...prev];
+          updatedSuccessArray[index] = true;
+          return updatedSuccessArray;
+        });
+        // Обновляем данные об участниках после успешного участия
+        axios.get('http://74.119.192.138:5000/api/role/all-roles')
+          .then(response => {
+            setParticipants(response.data);
+          })
+          .catch(error => {
+            console.error('Ошибка при загрузке данных об участниках:', error);
+          });
+        // Обработка дополнительных действий при необходимости
+      })
+      .catch(error => {
+        console.error('Ошибка при создании роли:', error);
+        // Обработка ошибок или отображение уведомления пользователю
+      });
+  };
   const handleCardToggle = (index) => {
     setCardsState((prevState) => {
       const newCardsState = [...prevState];
@@ -99,9 +131,12 @@ return (
                 </div>
           </div>
           <input
-            type="button"
-            value="Участвовать"
-          />
+                type="button"
+                value={participationSuccess[index] ? "Успешно" : "Участвовать"}
+                onClick={() => handleParticipate(card.ProjectID, index)}
+                disabled={participationSuccess[index]}
+                style={{ backgroundColor: participationSuccess[index] ? "grey" : "" }}
+              />
         </div>
       </div>
         ))}

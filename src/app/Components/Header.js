@@ -7,11 +7,11 @@ import '@/app/Styles/header.scss';
 
 export default function Header({ openModal }) {
   const dispatch = useDispatch();
-  const userId = useSelector((state) => state.auth.ID);
+  // const userId = useSelector((state) => state.auth.ID);
   const userInfo = useSelector((state) => state.auth.user);
   const isLoading = useSelector((state) => state.auth?.isLoading);
-
-
+  const userId = useSelector((state) => state.auth.ID);
+  
   useEffect(() => {
     if (userId) {
       dispatch(me(userId));
