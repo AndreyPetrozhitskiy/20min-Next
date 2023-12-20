@@ -1,5 +1,5 @@
 'use client'
-import Link from "next/link";
+import NextLink from "next/link";
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { me } from '@/app/Redux/features/auth/authSlice';
@@ -22,26 +22,26 @@ export default function Header({ openModal }) {
   return (
     <header className="Header">
       <div className="Header__logo">
-        <Link href="/">
+        <NextLink href="/">
           <img src="Logo__header.png" alt="Logo" />
-        </Link>
+        </NextLink>
       </div>
 
       <div className="Header__nav">
         <div className="Header__nav-link">
-          <Link href="/about">О нас</Link>
-          <Link href="/newproject">Создать проект</Link>
-          <Link href="/join">Присоединиться</Link>
-          <Link href="/projects">Проекты</Link>
+          <NextLink href="/about">О нас</NextLink>
+          <NextLink href="/newproject">Создать проект</NextLink>
+          <NextLink href="/join">Присоединиться</NextLink>
+          <NextLink href="/projects">Проекты</NextLink>
           {isLoading ? (
             <span>Loading...</span>
           ) : userId ? (
             <>
               <span>{userInfo}</span>
              
-              <Link href={`/profile/${userId}`}>
+              <NextLink href={`/profile/${userId}`}>
                 <img src="usericon.png" alt="User" />
-              </Link>
+              </NextLink>
             </>
           ) : (
             <input type="button" onClick={() => openModal("login")} value="Войти" />

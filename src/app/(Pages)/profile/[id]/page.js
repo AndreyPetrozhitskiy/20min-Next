@@ -5,7 +5,7 @@ import ModalPassword from "@/app/Components/ModalPassword";
 import { useDispatch, useSelector } from 'react-redux';
 import { me, logout } from '@/app/Redux/features/auth/authSlice';
 import axios from 'axios';  // Добавим этот импорт
-import Link from "next/link";
+import NextLink from "next/link";
 export default function Profile() {
   const [isModalOpenPassword, setIsModalOpenPassword] = useState(false);
   const [data, setData] = useState([]);
@@ -65,9 +65,9 @@ export default function Profile() {
     <ModalPassword isOpen={isModalOpenPassword} onClose={closeModalPassword} />
     <div className="Profile">
       <h1>Портфолио</h1>
-      <Link href="/">
+      <NextLink href="/">
         <input type="button" onClick={handleLogout} value={'Выйти'} />
-      </Link>
+      </NextLink>
       <div className="Profile__search">
         <div className="Profile__search__input">
           <input type="text" placeholder="Поиск" />
